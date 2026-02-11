@@ -15,9 +15,12 @@ resource "azurerm_cosmosdb_cassandra_table" "cosmosdb_cassandra_tables" {
         order_by = cluster_key.value.order_by
       }
     }
-    column {
-      name = each.value.schema.column.name
-      type = each.value.schema.column.type
+    dynamic "column" {
+      for_each = each.value.schema.column
+      content {
+        name = column.value.name
+        type = column.value.type
+      }
     }
     partition_key {
       name = each.value.schema.partition_key.name

@@ -32,10 +32,10 @@ EOT
         name     = string
         order_by = string
       }))
-      column = object({
+      column = list(object({
         name = string
         type = string
-      })
+      }))
       partition_key = object({
         name = string
       })
@@ -44,5 +44,13 @@ EOT
       max_throughput = optional(number)
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.cosmosdb_cassandra_tables : (
+        length(v.schema.column) >= 1
+      )
+    ])
+    error_message = "Each column list must contain at least 1 items"
+  }
 }
 
