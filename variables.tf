@@ -28,17 +28,17 @@ EOT
     default_ttl            = optional(number)
     throughput             = optional(number)
     schema = object({
-      cluster_key = optional(object({
+      cluster_key = optional(list(object({
         name     = string
         order_by = string
-      }))
+      })))
       column = list(object({
         name = string
         type = string
       }))
-      partition_key = object({
+      partition_key = list(object({
         name = string
-      })
+      }))
     })
     autoscale_settings = optional(object({
       max_throughput = optional(number)
@@ -52,38 +52,6 @@ EOT
     ])
     error_message = "Each column list must contain at least 1 items"
   }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_cassandra_tables : (
-        v.default_ttl == null || (v.default_ttl >= -1)
-      )
-    ])
-    error_message = "must be at least -1"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_cassandra_tables : (
-        length(v.schema.partition_key.name) > 0
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_cassandra_tables : (
-        v.schema.cluster_key == null || (length(v.schema.cluster_key.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.cosmosdb_cassandra_tables : (
-        v.schema.cluster_key == null || (contains(["Asc", "Desc"], v.schema.cluster_key.order_by))
-      )
-    ])
-    error_message = "must be one of: Asc, Desc"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_cosmosdb_cassandra_table's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -94,6 +62,9 @@ EOT
   #   source:    [from cosmosdb.ValidateCassandraKeyspaceID] !ok
   # path: cassandra_keyspace_id
   #   source:    [from cosmosdb.ValidateCassandraKeyspaceID] err != nil
+  # path: default_ttl
+  #   condition: value >= -1
+  #   message:   must be at least -1
   # path: analytical_storage_ttl
   #   source:    validation.All(...) - no translation rule yet, add one
   # path: schema.column.name
@@ -102,6 +73,15 @@ EOT
   # path: schema.column.type
   #   condition: length(value) > 0
   #   message:   must not be empty
+  # path: schema.partition_key.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: schema.cluster_key.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: schema.cluster_key.order_by
+  #   condition: contains(["Asc", "Desc"], value)
+  #   message:   must be one of: Asc, Desc
   # path: throughput
   #   source:    [from validate.CosmosThroughput] value < 400
   # path: throughput

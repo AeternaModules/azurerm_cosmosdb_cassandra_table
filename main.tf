@@ -9,7 +9,7 @@ resource "azurerm_cosmosdb_cassandra_table" "cosmosdb_cassandra_tables" {
 
   schema {
     dynamic "cluster_key" {
-      for_each = each.value.schema.cluster_key != null ? [each.value.schema.cluster_key] : []
+      for_each = each.value.schema.cluster_key != null ? each.value.schema.cluster_key : []
       content {
         name     = cluster_key.value.name
         order_by = cluster_key.value.order_by
@@ -22,8 +22,11 @@ resource "azurerm_cosmosdb_cassandra_table" "cosmosdb_cassandra_tables" {
         type = column.value.type
       }
     }
-    partition_key {
-      name = each.value.schema.partition_key.name
+    dynamic "partition_key" {
+      for_each = each.value.schema.partition_key
+      content {
+        name = partition_key.value.name
+      }
     }
   }
 
