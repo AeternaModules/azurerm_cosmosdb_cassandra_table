@@ -1,3 +1,7 @@
+output "cosmosdb_cassandra_tables_id" {
+  description = "Map of id values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
+  value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => v.id }
+}
 output "cosmosdb_cassandra_tables_analytical_storage_ttl" {
   description = "Map of analytical_storage_ttl values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
   value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => v.analytical_storage_ttl }
