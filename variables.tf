@@ -52,6 +52,14 @@ EOT
     ])
     error_message = "Each column list must contain at least 1 items"
   }
+  validation {
+    condition = alltrue([
+      for k, v in var.cosmosdb_cassandra_tables : (
+        length(v.schema.partition_key) >= 1
+      )
+    ])
+    error_message = "Each partition_key list must contain at least 1 items"
+  }
   # --- Unconfirmed validation candidates, derived from azurerm_cosmosdb_cassandra_table's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
