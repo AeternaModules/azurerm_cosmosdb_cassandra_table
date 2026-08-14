@@ -8,7 +8,7 @@ output "cosmosdb_cassandra_tables_analytical_storage_ttl" {
 }
 output "cosmosdb_cassandra_tables_autoscale_settings" {
   description = "Map of autoscale_settings values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
-  value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => v.autoscale_settings if v.autoscale_settings != null && length(v.autoscale_settings) > 0 }
+  value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => one(v.autoscale_settings) if v.autoscale_settings != null && length(v.autoscale_settings) > 0 }
 }
 output "cosmosdb_cassandra_tables_cassandra_keyspace_id" {
   description = "Map of cassandra_keyspace_id values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
@@ -24,7 +24,7 @@ output "cosmosdb_cassandra_tables_name" {
 }
 output "cosmosdb_cassandra_tables_schema" {
   description = "Map of schema values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
-  value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => v.schema if v.schema != null && length(v.schema) > 0 }
+  value       = { for k, v in azurerm_cosmosdb_cassandra_table.cosmosdb_cassandra_tables : k => one(v.schema) if v.schema != null && length(v.schema) > 0 }
 }
 output "cosmosdb_cassandra_tables_throughput" {
   description = "Map of throughput values across all cosmosdb_cassandra_tables, keyed the same as var.cosmosdb_cassandra_tables"
